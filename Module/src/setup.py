@@ -15,7 +15,7 @@ setup(
         packages=find_packages(),
         install_requires=[numpy, sympy],
         
-        keywords=['python', 'first package'],
+        keywords=['python', 'jacobian matrix', 'numerical jacobian', 'analytical jacobian'],
         classifiers= [
             "Development Status :: 3 - Alpha",
             "Intended Audience :: Education",
