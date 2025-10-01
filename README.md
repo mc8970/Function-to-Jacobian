@@ -4,7 +4,12 @@ PyJacAn is an open-source Python package that automatically computes the **analy
 
 ---
 
-![Package Logo](path/to/your/logo.png)  <!-- Add your package symbol here -->
+<!-- PROJECT LOGO -->
+<br />
+
+<div align="center">
+    <img src="Logo.png" alt="logo" width="250" height="300">
+</div>
 
 ## Features
 
