@@ -102,7 +102,7 @@ Tests confirm that Jacobians are **accurate, stable, and solver-ready**, reducin
 
 ## Dependencies
 
-- Python 3.7+
+- [Python](https://python.org/) >= 3.7+
 - [NumPy](https://numpy.org/) == 1.21.5
 - [SymPy](https://www.sympy.org/en/index.html) == 1.10.1
 - [SciPy](https://scipy.org/) >= 1.11
