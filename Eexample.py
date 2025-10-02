@@ -7,7 +7,7 @@ import sympy as sym
 import numpy as np
 from scipy.optimize import root
 import matplotlib.pyplot as plt
-from Module.src.main import analytical_jacobian
+from src.PyJacAn.core import analytical_jacobian
 
 # -----------------------------------------------------------------------------
 # Definition of bulk (differential scheme) and boundary functions for diffusion

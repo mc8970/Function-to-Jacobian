@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyjacan"
+version = "0.1.0"
+description = "Analytical Jacobian builder for stencil-based systems (differnetial equation + boundary conditions)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+  { name = "Marcel Čarman", email = "s242989@student.dtu.dk"},
+  { name = "Nejc Jeraj",    email = "nj2021@student.uni-lj.si"},
+  { name = "Tomaž Katrašnik",    email = "tomaz.katrasnik@fs.uni-lj.si"},
+  { name = "Klemen Zelič",    email = "klemen.zelic@fs.uni-lj.si"}
+]
+dependencies = [
+  "numpy>=1.24",
+  "sympy>=1.12",
+  "scipy>=1.11",
+  "matplotlib>=3.8"
+]
+
+[project.urls]
+Homepage = "https://github.com/mc8970/Function-to-Jacobian"
