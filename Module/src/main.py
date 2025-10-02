@@ -1,178 +1,136 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[10]:
-
-
 import sympy as sym
 import numpy as np
-from termcolor import colored
 
-def fun_v_jakobian(bulk, var_in_dolžine_slovar, levi_robni, desni_robni, lr_cut, slovar_vrednosti):
+def analytical_jacobian(bulk, var_and_length_dict, left_boundary, right_boundary, lr_cut, value_dict):
     """
-    Odvajanje funkcij podane v funkcijski obliki za ustvarjanje jakobiana.
+    Differentiates functions given in functional form to generate the Jacobian.
 
-    Parametri:
-    - bulk: funkcija, ki sprejme indekse in vrne sympy izraz za enačbe v večspremenljivčnem sistemu
-    - var_in_dolžine_slovar: slovar, ki določa število komponent za vsako spremenljivko
-    - levi_robni: funkcija, ki vrne izraz za levi robni pogoj
-    - desni_robni: funkcija, ki vrne izraz za desni robni pogoj
-    - lr_cut: slovar, kjer je prvi element seznam dolžin levega robnega pogoja za vsako spremenljivko, 
-      drugi pa seznam dolžin desnega robnega pogoja za vsako spremenljivko.
+    Parameters:
+    - bulk: function that takes indices and returns a sympy expression for equations 
+            in a multivariable system
+    - var_and_length_dict: dictionary that defines the number of components for each variable
+    - left_boundary: function that returns an expression for the left boundary condition
+    - right_boundary: function that returns an expression for the right boundary condition
+    - lr_cut: dictionary where the first element is a list of left boundary condition lengths 
+              for each variable, and the second element is a list of right boundary condition lengths 
+              for each variable
+    - value_dict: dictionary mapping symbols to numerical values
 
-    Rezultat:
-    - Jakobijeva matrika za seznam enačb, vključno z robnimi pogoji
+    Returns:
+    - Jacobian matrix for the list of equations, including boundary conditions
     """
-    # Generiranje simbolov za vse spremenljivke v vektorjih spremenljivk
-    vektor_spremenljivk = {var: [sym.symbols(f'{var}{i}') for i in range(var_in_dolžine_slovar[var])] 
-                           for var in var_in_dolžine_slovar}
+    # Generate symbols for all variables in variable vectors
+    variable_vectors = {
+        var: [sym.symbols(f'{var}{i}') for i in range(var_and_length_dict[var])] 
+        for var in var_and_length_dict
+    }
     
-    # Sploščitev seznama vseh vektorjev spremenljivk z njihovimi komponentami
-    vse_komponente = [komponenta for komponente in vektor_spremenljivk.values() for komponenta in komponente]
+    # Flatten the list of all variable vectors with their components
+    all_components = [component for components in variable_vectors.values() for component in components]
     
-    vsi_odvodi = []
+    all_derivatives = []
 
-    # Dodajanje levega robnega pogoja
-    if levi_robni:
-        levi_odvodi = levi_robni(vektor_spremenljivk)  # Več robnih pogojev
-        for odvod in levi_odvodi:
-            vsi_odvodi.append([sym.diff(odvod, komponenta) for komponenta in vse_komponente])
+    # Add left boundary condition
+    if left_boundary:
+        left_derivatives = left_boundary(variable_vectors)  # Multiple boundary conditions possible
+        for derivative in left_derivatives:
+            all_derivatives.append([sym.diff(derivative, component) for component in all_components])
 
-    # Obdelava vsake spremenljivke neodvisno
-    for var, components in vektor_spremenljivk.items():
+    # Process each variable independently
+    for var, components in variable_vectors.items():
         left_cut = lr_cut[0][var]
         right_cut = lr_cut[1][var]
         
-        # Generiranje izraza za vsak indeks, ob upoštevanju levega in desnega roba
+        # Generate expression for each index, considering left and right boundaries
         for i in range(left_cut, len(components) - right_cut):
-            fun = bulk(var, i, vektor_spremenljivk)
+            fun = bulk(var, i, variable_vectors)
             
-            fun_odvodi = []
+            fun_derivatives = []
             
-            # Diferenciacija generirane funkcije glede na vsako komponento
-            for komponenta in vse_komponente:
-                odvod = sym.diff(fun, komponenta)
-                fun_odvodi.append(odvod)
+            # Differentiate the generated function with respect to each component
+            for component in all_components:
+                derivative = sym.diff(fun, component)
+                fun_derivatives.append(derivative)
             
-            vsi_odvodi.append(fun_odvodi)
+            all_derivatives.append(fun_derivatives)
 
-    # Dodajanje desnega robnega pogoja
-    if desni_robni:
-        desni_odvodi = desni_robni(vektor_spremenljivk)  # Več robnih pogojev
-        for odvod in desni_odvodi:
-            vsi_odvodi.append([sym.diff(odvod, komponenta) for komponenta in vse_komponente])
+    # Add right boundary condition
+    if right_boundary:
+        right_derivatives = right_boundary(variable_vectors)  # Multiple boundary conditions possible
+        for derivative in right_derivatives:
+            all_derivatives.append([sym.diff(derivative, component) for component in all_components])
 
-    # Ustvarjanje matrike na podlagi odvodov. Ta je nerazvrščena
-    jakobian_nerazvrščen = sym.Matrix(vsi_odvodi)
+    # Create matrix based on derivatives. This is unsorted
+    unsorted_jacobian = sym.Matrix(all_derivatives)
     
-    #Tvorimo seznam posameznih dolžin spremenljivk
-    dolžine_spremenljivk = list(var_in_dolžine_slovar.values())
+    # Create a list of individual variable lengths
+    variable_lengths = list(var_and_length_dict.values())
     
-    #Funkcija ki pravilno razvrsti zgornje vrstice (RP)
-    def premik_dol(matrika, dolžine_spremenljivk):
-        vrednost_premikov = []
-        for i, num in enumerate(dolžine_spremenljivk):
+    # Function that correctly sorts the upper rows (BCs)
+    def move_down(matrix, variable_lengths):
+        shift_values = []
+        for i, num in enumerate(variable_lengths):
             if i == 0:
-                vrednost_premikov.append(0)
+                shift_values.append(0)
             else:
-                vrednost_premikov.append((len(dolžine_spremenljivk) - i - 1) + sum(dolžine_spremenljivk[:i]) - i - 1)
+                shift_values.append((len(variable_lengths) - i - 1) + sum(variable_lengths[:i]) - i - 1)
 
-        vrednost_premikov.pop(0)
+        shift_values.pop(0)
 
-        for positions in vrednost_premikov:
-            if len(matrika) < 2:
-                return matrika
+        for positions in shift_values:
+            if len(matrix) < 2:
+                return matrix
 
-            row_to_move = matrika.row(1)
-            matrika.row_del(1)
-            new_index = min(1 + positions, len(matrika) - 1)
-            matrika = matrika.row_insert(new_index, row_to_move)
+            row_to_move = matrix.row(1)
+            matrix.row_del(1)
+            new_index = min(1 + positions, len(matrix) - 1)
+            matrix = matrix.row_insert(new_index, row_to_move)
 
-        return matrika
+        return matrix
     
-    jakobian_zgoraj_razvrščen = sym.Matrix(premik_dol(jakobian_nerazvrščen, dolžine_spremenljivk))
+    upper_sorted_jacobian = sym.Matrix(move_down(unsorted_jacobian, variable_lengths))
     
-    #Funkcija, ki pravilno razvrsti spodnje vrstice (RP)
-    def premik_gor(matrika, dolžine_spremenljivk):
-        dolžine_spremenljivk = dolžine_spremenljivk[::-1]
-        vrednost_premikov = []
-        for i, num in enumerate(dolžine_spremenljivk):
+    # Function that correctly sorts the lower rows (BCs)
+    def move_up(matrix, variable_lengths):
+        variable_lengths = variable_lengths[::-1]
+        shift_values = []
+        for i, num in enumerate(variable_lengths):
             if i == 0:
-                vrednost_premikov.append(0)
+                shift_values.append(0)
             else:
-                vrednost_premikov.append((len(dolžine_spremenljivk) - i -1) + sum(dolžine_spremenljivk[:i])-1)
+                shift_values.append((len(variable_lengths) - i - 1) + sum(variable_lengths[:i]) - 1)
 
-        vrednost_premikov.pop(0)
+        shift_values.pop(0)
         
-        for positions in vrednost_premikov:
-            if len(matrika) < 2:
-                return matrika
+        for positions in shift_values:
+            if len(matrix) < 2:
+                return matrix
 
-            row_to_move = matrika.row(-2)
-            matrika.row_del(-2)
-            new_index = min(-1- positions, len(matrika))
-            matrika = matrika.row_insert(new_index, row_to_move)
+            row_to_move = matrix.row(-2)
+            matrix.row_del(-2)
+            new_index = min(-1 - positions, len(matrix))
+            matrix = matrix.row_insert(new_index, row_to_move)
 
-        return matrika
+        return matrix
 
+    sorted_jacobian = sym.Matrix(move_up(upper_sorted_jacobian, variable_lengths))
     
-    jakobian = sym.Matrix(premik_gor(jakobian_zgoraj_razvrščen, dolžine_spremenljivk))
-    
-    #Funkcija, ki vstavi vrednosti v matriko
-    def vstavitev_vrednosti(slovar_vrednosti, matrix):
-
+    # Function that inserts values into the matrix
+    def insert_values(value_dict, matrix):
         symbols = list(matrix.free_symbols)
         lambdified_func = sym.lambdify(symbols, matrix, 'numpy')
-        matrix_np = lambdified_func(**slovar_vrednosti)
+        matrix_np = lambdified_func(**value_dict)
         return matrix_np
     
-    vrednosti_jakobiana = vstavitev_vrednosti(slovar_vrednosti, jakobian)
-    jac = [jakobian, vrednosti_jakobiana]
+    jacobian_values = insert_values(value_dict, sorted_jacobian)
+    jac = [sorted_jacobian, jacobian_values]
     
-    # Za rdeč tekst
-    def print_red(text):
-        print(colored(text, 'red'))
-
-    # Javljanje napake oz., če je kaj narobe z jakobianom
-    if not np.all(np.diagonal(vrednosti_jakobiana)):
-       print_red(f"POZOR! Ničle na diagonali.")
-    if jakobian.shape[0] != jakobian.shape[1]:
-       print_red(f"POZOR! Jakobian ni kvadratna matrika.")
+    # Error reporting if something is wrong with the Jacobian
+    if not np.all(np.diagonal(jacobian_values)):
+       print(f"WARNING! Zeros on the diagonal.")
+    if sorted_jacobian.shape[0] != sorted_jacobian.shape[1]:
+       print(f"WARNING! Jacobian is not a square matrix.")
     return jac
-
-# Definicije funkcij in robnih pogojev
-def bulk(var, i, vars):
-    u = vars['u']
-    v = vars['v']
-    z = vars['z']
-    D, dt, dx, u_old = sym.symbols('D dt dx u_old')
-    if var == 'u':
-        return D * (u[i - 1] - 2 * u[i] + u[i + 1]) * dt / dx**2 + u_old - u[i] + z[i - 1] + z[i]
-    elif var == 'v':
-        return v[i] * 2
-    elif var == 'z':
-        return z[i] - z[i - 1]
-
-def levi_robni(vars):
-    u = vars['u'][0]
-    v = vars['v'][0]
-    z = vars['z'][0]
-    return [u - v - 100 + z, z + v, v * 2]
-
-def desni_robni(vars):
-    u = vars['u'][-1]
-    v = vars['v'][-1]
-    z = vars['z'][-1]
-    return [u + v - 200 - z, v + z, z * 2]
-
-# Dolžine spremenljivk in robnih pogojev
-var_in_dolžine_slovar = {'u': 5, 'v': 4, 'z': 6}
-lr_cut = [{'u': 1, 'v': 1, 'z': 1}, {'u': 1, 'v': 1, 'z': 1}]
-slovar_vrednosti = {'D': 0.1, 'dt': 0.2, 'dx': 0.3}
-
-# Generiranje Jakobijeve matrike in preverjanje njene oblike
-jakobian = fun_v_jakobian(bulk, var_in_dolžine_slovar, levi_robni, desni_robni, lr_cut, slovar_vrednosti)
-
-# Izpis Jakobijeve matrike za preverjanje njene strukture
-jakobian[0]
-
