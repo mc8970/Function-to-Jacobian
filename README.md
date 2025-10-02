@@ -23,25 +23,38 @@ PyJacAn is an open-source Python package that automatically computes the **analy
 
 ## Installation
 
-Requires **Python 3.7+**. Install dependencies via pip:
+You can install PyJacAn in two ways:
+
+### 1. Install via pip (recommended)
+PyJacAn is pip-installable. Run:
 
 ```bash
-pip install numpy==1.21.5 sympy==1.10.1
+pip install pyjacan
 ```
+This will automatically install all dependencies:
+- numpy>=1.24
+- sympy>=1.12
+- scipy>=1.11
+- matplotlib>=3.8
 
-Clone the repository:
+
+### 2. Manual installation from GitHub
+You can also clone the repository and install manually:
 
 ```bash
 git clone https://github.com/mc8970/Function-to-Jacobian.git
 cd Function-to-Jacobian
+pip install -e .
 ```
+
+This method also installs all required dependencies automatically.
 
 ---
 
 ## Usage
 
 ```python
-from jacobian import jacobian
+from pyjacan import analytical_jacobian
 import sympy as sym
 
 # Define your residual functions
@@ -92,7 +105,8 @@ Tests confirm that Jacobians are **accurate, stable, and solver-ready**, reducin
 - Python 3.7+
 - [NumPy](https://numpy.org/) == 1.21.5
 - [SymPy](https://www.sympy.org/en/index.html) == 1.10.1
-
+- [SciPy](https://scipy.org/) >= 1.11
+- [Matplotlib](https://matplotlib.org/) >= 3.8
 ---
 
 ## License
