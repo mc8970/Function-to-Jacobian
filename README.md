@@ -81,7 +81,7 @@ lr_cut = [{'C':1,'T':1}, {'C':1,'T':1}]
 values_dict = {'D':1e-9, 'alpha':1e-6, 'gamma1':0.05, 'gamma2':0.01, 'dt':0.1, 'dx':0.2}
 
 # Generate Jacobian
-J_sym, J_num = jacobian(leading, var_and_lengths_dict,
+J_sym, J_num = analytical_jacobian(leading, var_and_lengths_dict,
                         left_boundary, right_boundary,
                         lr_cut, values_dict)
 ```
