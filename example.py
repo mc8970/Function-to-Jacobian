@@ -6,10 +6,10 @@ import timeit
 from scipy.integrate import simpson
 
 #If you have installed the package via pip, use the following line
-from pyjacan import analytical_jacobian
+#from pyjacan import analytical_jacobian
 
 #if you are running the code from the source folder, use the following line instead
-#from src.PyJacAn.core import analytical_jacobian
+from src.pyjacan.core import analytical_jacobian
 
 
 # -----------------------------------------------------------------------------
