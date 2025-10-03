@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Analytical Jacobian builder for stencil-based systems (differnetial equation + boundary conditions)"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = {text = "CC BY-NC-SA 4.0"}
 authors = [
   { name = "Marcel Čarman", email = "s242989@student.dtu.dk"},
   { name = "Nejc Jeraj",    email = "nj2021@student.uni-lj.si"},
