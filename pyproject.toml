@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyjacan"
-version = "1.0.0"
+version = "1.1.0"
 description = "Analytical Jacobian builder for stencil-based systems (differnetial equation + boundary conditions)"
 readme = "README.md"
 requires-python = ">=3.9"
