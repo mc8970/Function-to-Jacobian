@@ -136,7 +136,7 @@ def analytical_solution_on_grid(x_eval, t, L, D, u0, x_grid, suma=150, points=20
 L = 10         # Length of the domain
 D = 0.5        # Diffusion coefficient
 T = 50          # Total simulation time
-Nx = 31         # Number of spatial discretization points
+Nx = 231         # Number of spatial discretization points
 dt = 0.1       # Time step
 N_iter = int(T/dt)  # Number of time steps
 
