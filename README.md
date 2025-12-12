@@ -140,7 +140,7 @@ python -m pytest tests/test_analytical_jacobian.py -q
 ## License
 
 - Code repository: [GPLv3](https://github.com/mc8970/Function-to-Jacobian)  
-- Zenodo archive: [DOI:10.5281/zenodo.14056930](https://doi.org/10.5281/zenodo.14056930)
+- Zenodo archive: [DOI:10.5281/zenodo.17911373](https://doi.org/10.5281/zenodo.17911373)
 
 ---
 
@@ -148,7 +148,7 @@ python -m pytest tests/test_analytical_jacobian.py -q
 
 If you use PyJacAn in your research, please cite:
 
-> Jeraj, N. PyJacAn: Automatic Analytic Jacobian Generator, Zenodo, 2024. DOI: [10.5281/zenodo.14056930](https://doi.org/10.5281/zenodo.14056930)
+> Zelič, K. Čarman, M. Jeraj, N., Function-to-Jacobian, Zenodo, 2025. DOI: [10.5281/zenodo.17911373](https://doi.org/10.5281/zenodo.17911373)
 
 ---
 
