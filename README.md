@@ -100,6 +100,34 @@ Tests confirm that Jacobians are **accurate, stable, and solver-ready**, reducin
 
 ---
 
+## Running Tests
+
+PyJacAn includes **automated unit tests** to ensure that the analytic Jacobian calculations are correct. These tests are implemented using **Pytest**.
+
+### Running all tests
+
+From the project root directory, run:
+
+python -m pytest -q
+
+This will automatically discover all test files in the `tests/` folder and report the results. For example, a passing test will show:
+
+1 passed in 0.52s
+
+### Running a specific test file
+
+To run only the test for the analytic Jacobian:
+
+python -m pytest tests/test_analytical_jacobian.py -q
+
+### Notes
+
+- Tests are automatically set up to work with the **src/pyjacan** layout.  
+- No additional configuration is needed if PyJacAn was installed via `pip install -e .` or dependencies were installed.  
+- If a test fails, Pytest will show the failed assertion and the expected vs. computed values for easy debugging.
+
+---
+
 ## Dependencies
 
 - [Python](https://python.org/) >= 3.7+
